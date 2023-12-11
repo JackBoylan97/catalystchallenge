@@ -56,8 +56,8 @@ class UserUploader
             $stmt = $this->pdo->prepare("INSERT INTO users(name, surname, email) VALUES (:name, :surname, :email)");
 
             foreach ($data as $row) {
-                $name = ucfirst(strtolower(trim($row[0])));
-                $surname = ucfirst(strtolower(trim($row[1])));
+                $name = $this->sanitizeName($row[0]);
+                $surname = $this->sanitizeName($row[1]);
                 $email = strtolower(trim($row[2]));
 
                 if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -81,13 +81,19 @@ class UserUploader
         }
     }
 
-    public function isEmailUnique(string $email)
+    public function isEmailUnique(string $email) : bool
     {
         $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM users WHERE email = :email");
         $stmt->bindParam(':email', $email);
         $stmt->execute();
         $count = $stmt->fetchColumn();
         return $count === 0;
+    }
+
+    public function sanitizeName(string $name ) :string
+    {
+        //got the regex from internet!
+        return ucfirst(preg_replace('/[^A-Za-z]/', '', strtolower(trim($name))));
     }
 
     public function run(array $options)

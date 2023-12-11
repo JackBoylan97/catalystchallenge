@@ -84,6 +84,7 @@ class UserUploader
     public function isEmailUnique(string $email) : bool
     {
         $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM users WHERE email = :email");
+
         $stmt->bindParam(':email', $email);
         $stmt->execute();
         $count = $stmt->fetchColumn();
@@ -116,6 +117,7 @@ class UserUploader
         if (empty($filename)) {
             die("Error: Please provide a CSV file name" . PHP_EOL);
         }
+        $this->pdo->exec("USE users_db");
 
         $data = $this->parseCSV($filename);
 
@@ -144,7 +146,7 @@ $username = $options['u'] ?? 'root';
 $password = $options['p'] ?? '';
 
 try {
-    $pdo = new PDO("mysql:host=$host;dbname=users_db", $username, $password);
+    $pdo = new PDO("mysql:host=$host", $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     // Script Execution

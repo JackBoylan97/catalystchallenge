@@ -90,10 +90,18 @@ class UserUploader
         return $count === 0;
     }
 
+    //used for separating surnames with apostrophes and removing special chars
     public function sanitizeName(string $name ) :string
     {
-        //got the regex from internet!
-        return ucfirst(preg_replace('/[^A-Za-z]/', '', strtolower(trim($name))));
+        $nameParts = explode("'", $name);
+        $sanitizedParts = array_map(
+            function ($part) {
+                return ucfirst(preg_replace('/[^A-Za-z]/', '', strtolower(trim($part))));
+            },
+            $nameParts
+        );
+
+        return implode("'", $sanitizedParts);
     }
 
     public function run(array $options)

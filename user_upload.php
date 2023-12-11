@@ -51,6 +51,7 @@ class UserUploader
 
     public function insertData(array $data)
     {
+        $count = 0;
         try {
             $stmt = $this->pdo->prepare("INSERT INTO users(name, surname, email) VALUES (:name, :surname, :email)");
 
@@ -60,18 +61,33 @@ class UserUploader
                 $email = strtolower(trim($row[2]));
 
                 if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                    $stmt->bindParam(':name', $name);
-                    $stmt->bindParam(':surname', $surname);
-                    $stmt->bindParam(':email', $email);
-                    $stmt->execute();
+                    if ($this->isEmailUnique($email)) {
+                        $stmt->bindParam(':name', $name);
+                        $stmt->bindParam(':surname', $surname);
+                        $stmt->bindParam(':email', $email);
+                        $stmt->execute();
+                        echo "Data inserted successfully" . PHP_EOL;
+                        $count++;
+                    } else {
+                        echo "Email already exists: $email. Skipping" . PHP_EOL;
+                    }
                 } else {
                     echo "Invalid email: $email. Skipping" . PHP_EOL;
                 }
             }
-            echo "Data inserted successfully" . PHP_EOL;
+            echo $count . " rows inserted" . PHP_EOL;
         } catch (PDOException $e) {
             die("Data Insertion failed:" . $e->getMessage());
         }
+    }
+
+    public function isEmailUnique(string $email)
+    {
+        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM users WHERE email = :email");
+        $stmt->bindParam(':email', $email);
+        $stmt->execute();
+        $count = $stmt->fetchColumn();
+        return $count === 0;
     }
 
     public function run(array $options)

@@ -1,0 +1,17 @@
+{
+    "name": "jackboylan/catalystchallenge",
+    "autoload": {
+        "psr-4": {
+            "Jackboylan\\Catalystchallenge\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Jack Boylan",
+            "email": "35166529+JackBoylan97@users.noreply.github.com"
+        }
+    ],
+    "require-dev": {
+        "phpunit/phpunit": "^10.5"
+    }
+}
